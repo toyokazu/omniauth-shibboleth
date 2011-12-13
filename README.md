@@ -1,18 +1,19 @@
 # OmniAuth Shibboleth
 
-Welcome to the OmniAuth Shibboleth strategies.
+Welcome to the OmniAuth Shibboleth strategies. This is a OmniAuth strategy for authenticating through Shibboleth (SAML). If you do not know OmniAuth, please visit OmniAuth wiki.
 
-Currently, the document is written for Rails applications. If you tried other environments, please let me know in the Issue page.
+https://github.com/intridea/omniauth/wiki
+
+Currently, this document is written for Rails applications. If you tried the other environments and it requires some difficulities, please let me know in the Issues page.
+
+https://github.com/toyokazu/omniauth-shibboleth/issues
 
 ## Getting Started
 
 ### Installation
 
     % gem install omniauth
-    % git clone git://github.com/toyokazu/omniauth-shibboleth.git
-    % cd omniauth-shibboleth
-    % rake build
-    % gem install pkg/omniauth-shibboleth-1.x.x.gem
+    % gem install omniauth-shibboleth
 
 ### Setup Gemfile
 
