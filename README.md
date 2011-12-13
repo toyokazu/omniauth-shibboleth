@@ -58,6 +58,7 @@ These can be changed by :uid_field and :fields option.
 In your application, simply direct users to '/auth/shibboleth' to have them sign in via your company's Shibboleth SP and IdP. '/auth/shibboleth' url simply redirect users to '/auth/shibboleth/callback', so thus you must protect '/auth/shibboleth/callback' by Shibboleth SP.
 
 Example shibd.conf:
+
     <Location /application_path/auth/shibboleth/callback>
       AuthType shibboleth
       ShibRequestSetting requireSession 1
