@@ -11,7 +11,7 @@ module OmniAuth
         [ 
           302,
           {
-            'Location' => callback_url,
+            'Location' => script_name + callback_path + query_string,
             'Content-Type' => 'text/plain'
           },
           ["You are being redirected to Shibboleth SP/IdP for sign-in."]
@@ -20,7 +20,7 @@ module OmniAuth
 
       def callback_phase
         #raise request.inspect
-        return fail!(:no_session, 'No Shibboleth Session') unless request.env['Shib-Session-ID']
+        return fail!(:no_shibboleth_session) unless request.env['Shib-Session-ID']
         super
       end
       
