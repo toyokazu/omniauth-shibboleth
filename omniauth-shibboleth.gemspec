@@ -2,7 +2,7 @@
 require File.expand_path('../lib/omniauth-shibboleth/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'omniauth', '~> 1.0.0.pr2'
+  gem.add_dependency 'omniauth', '~> 1.0.0'
 
   gem.authors       = ["Toyokazu Akiyama"]
   gem.email         = ["toyokazu@gmail.com"]
@@ -10,8 +10,8 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{OmniAuth Shibboleth strategies for OmniAuth 1.0}
   gem.homepage      = ""
 
-  #gem.executables   = `find bin/*`.split("\n").map{ |f| File.basename(f) }
-  gem.files         = `find .`.split("\n").map{ |f| f.gsub(/^.\//, '') }
+  gem.files         = `find . -not \\( -regex ".*\\.git.*" -o -regex "\\./pkg.*" -o -regex "\\./spec.*" \\)`.split("\n").map{ |f| f.gsub(/^.\//, '') }
+  #gem.files         = `find .`.split("\n").map{ |f| f.gsub(/^.\//, '') }
   gem.test_files    = `find spec/*`.split("\n")
   #gem.test_files    = `find test/* spec/* features/*`.split("\n")
   gem.name          = "omniauth-shibboleth"
