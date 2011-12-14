@@ -1,6 +1,6 @@
 # OmniAuth Shibboleth strategy
 
-Welcome to the OmniAuth Shibboleth strategies. This is a OmniAuth strategy for authenticating through Shibboleth (SAML). If you do not know OmniAuth, please visit OmniAuth wiki.
+OmniAuth Shibboleth strategy is an OmniAuth strategy for authenticating through Shibboleth (SAML). If you do not know OmniAuth, please visit OmniAuth wiki.
 
 https://github.com/intridea/omniauth/wiki
 
@@ -8,7 +8,7 @@ The detail of the authentication middleware Shibboleth is introduced in Shibbole
 
 https://wiki.shibboleth.net/
 
-OmniAuth basically works as a middleware of Rack applications. It provide environment variable named 'omniauth.auth' (auth hash) after authenticate user. The 'auth hash' includes user attributes. By providing user attributes in the fixed format, applications can easily implement authentication function using multiple authentication methods.
+OmniAuth basically works as a middleware of Rack applications. It provides environment variable named 'omniauth.auth' (auth hash) after authenticating a user. The 'auth hash' includes the user's attributes. By providing user attributes in the fixed format, applications can easily implement authentication function using multiple authentication methods.
 
 OmniAuth Shibboleth strategy uses the 'auth hash' for providing user attributes passed by Shibboleth SP. It enables developers to use Shibboleth and the other authentication methods, including local auth, together in one application.
 
@@ -40,7 +40,7 @@ To use OmniAuth Shibboleth strategy as a middleware in your rails application, a
         :extra_fields => [
           :"unscoped-affiliation",
           :entitlement
-            ]
+        ]
       }
     end
 
@@ -55,13 +55,12 @@ These can be changed by :uid_field and :fields option.
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
-        :uid_field => :eppn,
-        :fields => [
-          :name => :displayName,
-          :email => :mail
-          ]
+        :uid_field => :uid,
+        :fields => []
       }
     end
+
+In the above example, Shibboleth strategy does not pass any :info fields and use 'uid' attribute as uid fields.
 
 ### How to authenticate users
 
