@@ -1,8 +1,16 @@
-# OmniAuth Shibboleth
+# OmniAuth Shibboleth strategy
 
 Welcome to the OmniAuth Shibboleth strategies. This is a OmniAuth strategy for authenticating through Shibboleth (SAML). If you do not know OmniAuth, please visit OmniAuth wiki.
 
 https://github.com/intridea/omniauth/wiki
+
+The detail of the authentication middleware Shibboleth is introduced in Shibboleth wiki.
+
+https://wiki.shibboleth.net/
+
+OmniAuth basically works as a middleware of Rack applications. It provide environment variable named 'omniauth.auth' (auth hash) after authenticate user. The 'auth hash' includes user attributes. By providing user attributes in the fixed format, applications can easily implement authentication function using multiple authentication methods.
+
+OmniAuth Shibboleth strategy uses the 'auth hash' for providing user attributes passed by Shibboleth SP. It enables developers to use Shibboleth and the other authentication methods, including local auth, together in one application.
 
 Currently, this document is written for Rails applications. If you tried the other environments and it requires some difficulities, please let me know in the Issues page.
 
@@ -17,13 +25,14 @@ https://github.com/toyokazu/omniauth-shibboleth/issues
 
 ### Setup Gemfile
 
+    % cd rails-app
     % vi Gemfile
     gem 'omniauth'
     gem 'omniauth-shibboleth'
 
 ### Setup Shibboleth Strategy
 
-To use Shibboleth strategy as a middleware in your rails application, add the following file to your rails application initializer directory.
+To use OmniAuth Shibboleth strategy as a middleware in your rails application, add the following file to your rails application initializer directory.
 
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
@@ -35,7 +44,7 @@ To use Shibboleth strategy as a middleware in your rails application, add the fo
       }
     end
 
-In the above example, 'unscoped-affiliation' and 'entitlement' attributes are additionally provided in the raw_info field. They can be referred like request.env["omniauth.auth"]["extra"]["raw_info"]["unscoped-affiliation"]. The detail of the omniauth hash schema is described in the following page.
+In the above example, 'unscoped-affiliation' and 'entitlement' attributes are additionally provided in the raw_info field. They can be referred like request.env["omniauth.auth"]["extra"]["raw_info"]["unscoped-affiliation"]. The detail of the omniauth auth hash schema is described in the following page.
 
 https://github.com/intridea/omniauth/wiki/Auth-Hash-Schema
 
@@ -74,6 +83,14 @@ https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
 
 To provide Shibboleth attributes via environment variables, we can not use proxy_balancer base approach. Currently we can realize it by using Phusion Passenger as an application container. An example construction pattern is shown in presence_checker application (https://github.com/toyokazu/presence_checker/).
 
+### development mode
+
+When you deploy a new application, you may want to confirm the assumed attributes are correctly provided by Shibboleth SP. OmniAuth Shibboleth strategy provides a confirmation option :dev_mode. If you set :dev_mode true, you can see the environment variables provided at the /auth/shibboleth/callback uri.
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, { :dev_mode => true }
+    end
 
 ## License
 

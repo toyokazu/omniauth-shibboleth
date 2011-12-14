@@ -6,6 +6,7 @@ module OmniAuth
       option :uid_field, :eppn
       option :fields, [:name, :email]
       option :extra_fields, []
+      option :dev_mode, false
 
       def request_phase
         [ 
@@ -19,7 +20,16 @@ module OmniAuth
       end
 
       def callback_phase
-        #raise request.inspect
+        if options[:dev_mode]
+          # dump attributes
+          return [
+            200,
+            {
+              'Content-Type' => 'text/plain'
+            },
+            [request.env.sort.map {|i| "#{i[0]}: #{i[1]}" }.join("\n")]
+          ]
+        end
         return fail!(:no_shibboleth_session) unless request.env['Shib-Session-ID']
         super
       end

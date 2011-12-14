@@ -54,7 +54,7 @@ describe OmniAuth::Strategies::Shibboleth do
       end
     end
 
-    context 'with Shibboleth session and custom options' do
+    context 'with Shibboleth session and attribute options' do
       let(:options){ { :uid_field => :uid, :fields => [], :extra_fields => [:o, :affiliation] } }
       let(:app){ lambda{|env| [404, {}, ['Awesome']]}}
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
@@ -67,6 +67,21 @@ describe OmniAuth::Strategies::Shibboleth do
         strategy.env['omniauth.auth']['uid'].should == @uid
         strategy.env['omniauth.auth']['extra']['raw_info']['o'].should == @organization
         strategy.env['omniauth.auth']['extra']['raw_info']['affiliation'].should == @affiliation
+      end
+    end
+
+    context 'with dev_mode options' do
+      let(:options){ { :dev_mode => true} }
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+
+      it 'should raise environment variables' do
+        @dummy_id = 'abcdefg'
+        @eppn = 'test@example.com'
+        @display_name = 'Test User'
+        @email = 'test@example.com'
+        env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'eppn' => @eppn, 'displayName' => @display_name, 'mail' => @email)
+        response = strategy.call!(env)
+        response[0].should == 200
       end
     end
   end
