@@ -74,7 +74,7 @@ Example shibd.conf:
       require valid-user
     </Location>
 
-Shibboleth strategy just checks the existence of Shib-Session-ID. 
+Shibboleth strategy just checks the existence of Shib-Session-ID or Shib-Application-ID. 
 
 Shibboleth strategy assumes the attributes are provided via environment variables because the use of ShibUseHeaders option may cause some problems. The details are discussed in the following page:
 

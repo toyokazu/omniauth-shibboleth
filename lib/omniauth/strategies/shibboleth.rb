@@ -30,7 +30,7 @@ module OmniAuth
             [request.env.sort.map {|i| "#{i[0]}: #{i[1]}" }.join("\n")]
           ]
         end
-        return fail!(:no_shibboleth_session) unless request.env['Shib-Session-ID']
+        return fail!(:no_shibboleth_session) unless (request.env['Shib-Session-ID'] || request.env['Shib-Application-ID'])
         super
       end
       
