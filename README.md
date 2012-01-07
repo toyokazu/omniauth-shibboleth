@@ -74,7 +74,11 @@ Example shibd.conf:
       require valid-user
     </Location>
 
-Shibboleth strategy just checks the existence of Shib-Session-ID or Shib-Application-ID. 
+Shibboleth strategy just checks the existence of Shib-Session-ID or Shib-Application-ID.
+
+If you want to use omniauth-shibboleth without Apache or IIS, you can try **rack-saml**. It supports a part of Shibboleth SP functions.
+
+https://github.com/toyokazu/rack-saml
 
 Shibboleth strategy assumes the attributes are provided via environment variables because the use of ShibUseHeaders option may cause some problems. The details are discussed in the following page:
 
