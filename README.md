@@ -95,7 +95,7 @@ When you deploy a new application, you may want to confirm the assumed attribute
       provider :shibboleth, { :dev_mode => true }
     end
 
-## License
+## License (MIT License)
 
 Copyright (C) 2011 by Toyokazu Akiyama.
 
