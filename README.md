@@ -20,14 +20,12 @@ https://github.com/toyokazu/omniauth-shibboleth/issues
 
 ### Installation
 
-    % gem install omniauth
     % gem install omniauth-shibboleth
 
 ### Setup Gemfile
 
     % cd rails-app
     % vi Gemfile
-    gem 'omniauth'
     gem 'omniauth-shibboleth'
 
 ### Setup Shibboleth Strategy
