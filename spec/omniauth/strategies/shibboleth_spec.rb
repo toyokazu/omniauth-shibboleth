@@ -35,7 +35,7 @@ describe OmniAuth::Strategies::Shibboleth do
 
       it 'should fail to get Shib-Session-ID environment variable' do
         last_response.status.should == 302
-        last_response.location.should == '/auth/failure?message=no_shibboleth_session'
+        last_response.location.should == '/auth/failure?message=no_shibboleth_session&strategy=shibboleth'
       end
     end
 
