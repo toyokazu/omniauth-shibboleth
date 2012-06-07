@@ -2,7 +2,11 @@
 require File.expand_path('../lib/omniauth-shibboleth/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'omniauth', '>= 1.0.0'
+  gem.add_dependency 'omniauth', '>= 1.1.0'
+
+  gem.add_development_dependency 'rack-test'
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rspec', '~> 2.8'
 
   gem.authors       = ["Toyokazu Akiyama"]
   gem.email         = ["toyokazu@gmail.com"]
@@ -15,4 +19,6 @@ Gem::Specification.new do |gem|
   gem.name          = "omniauth-shibboleth"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::Shibboleth::VERSION
+
+
 end
