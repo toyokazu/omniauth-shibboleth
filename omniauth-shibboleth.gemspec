@@ -2,7 +2,7 @@
 require File.expand_path('../lib/omniauth-shibboleth/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'omniauth', '>= 1.1.0'
+  gem.add_dependency 'omniauth', '>= 1.0.0'
 
   gem.add_development_dependency 'rack-test'
   gem.add_development_dependency 'rake'

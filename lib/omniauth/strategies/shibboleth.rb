@@ -6,7 +6,7 @@ module OmniAuth
       option :uid_field, :eppn
       option :fields, [:name, :email]
       option :extra_fields, []
-      option :dev_mode, false
+      option :debug, false
 
       def request_phase
         [ 
@@ -20,7 +20,7 @@ module OmniAuth
       end
 
       def callback_phase
-        if options[:dev_mode]
+        if options[:debug]
           # dump attributes
           return [
             200,
