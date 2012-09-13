@@ -63,7 +63,7 @@ describe OmniAuth::Strategies::Shibboleth do
     end
 
     context 'with Shibboleth session and attribute options' do
-      let(:options){ { :uid_field => :uid, :fields => [], :extra_fields => [:o, :affiliation] } }
+      let(:options){ { :fields => {}, :extra_fields => [:o, :affiliation] } }
       let(:app){ lambda{|env| [404, {}, ['Awesome']]}}
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 

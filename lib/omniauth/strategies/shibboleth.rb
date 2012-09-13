@@ -3,8 +3,9 @@ module OmniAuth
     class Shibboleth
       include OmniAuth::Strategy
 
-      option :uid_field, :eppn
-      option :fields, [:name, :email]
+      option :shib_session_id_var, 'Shib-Session-ID'
+      option :shib_application_id_var, 'Shib-Application-ID'
+      option :fields, {:uid => 'eppn', :name => 'displayName' , :email => 'mail'}
       option :extra_fields, []
       option :debug, false
 
@@ -30,26 +31,20 @@ module OmniAuth
             [request.env.sort.map {|i| "#{i[0]}: #{i[1]}" }.join("\n")]
           ]
         end
-        return fail!(:no_shibboleth_session) unless (request.env['Shib-Session-ID'] || request.env['Shib-Application-ID'])
+        return fail!(:no_shibboleth_session) unless (request.env[options.shib_session_id_var] || request.env[options.shib_application_id_var])
         super
       end
       
       uid do
-        request.env[options.uid_field.to_s]
+        request.env[options.fields.uid.to_s]
       end
 
       info do
-        options.fields.inject({}) do |hash, field|
-          case field
-          when :name
-            hash[field] = request.env['displayName']
-          when :email
-            hash[field] = request.env['mail']
-          else
-            hash[field] = request.env[field.to_s]
-          end
-          hash
+        res = {}
+        options.fields.each_pair do |k,v|
+          res[k] = request.env[v]
         end
+        res
       end
 
       extra do
