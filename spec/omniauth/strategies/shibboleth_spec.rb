@@ -69,6 +69,7 @@ describe OmniAuth::Strategies::Shibboleth do
         :uid_field => :eppn,
         :name_field => :displayName,
         :email_field => :mail,
+	:fields => {},
         :extra_fields => [:o, :affiliation] } }
       let(:app){ lambda{|env| [404, {}, ['Awesome']]}}
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }

@@ -8,6 +8,7 @@ module OmniAuth
       option :uid_field, 'eppn'
       option :name_field, 'displayName'
       option :email_field, 'mail'
+      option :fields, {}
       option :extra_fields, []
       option :debug, false
 
@@ -42,11 +43,15 @@ module OmniAuth
       end
 
       info do
-        {
+        res = {
           :uid   => request.env[options.uid_field.to_s],
           :name  => request.env[options.name_field.to_s],
           :email => request.env[options.email_field.to_s],
         }
+        options.fields.each_pair do |k,v|
+          res[k] = request.env[v.to_s]
+        end
+        res
       end
 
       extra do
