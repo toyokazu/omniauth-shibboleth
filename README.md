@@ -35,6 +35,9 @@ To use OmniAuth Shibboleth strategy as a middleware in your rails application, a
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
+        :shib_session_id_field     => "Shib-Session-ID",
+        :shib_application_id_field => "Shib-Application-ID",
+        :debug                     => false,
         :extra_fields => [
           :"unscoped-affiliation",
           :entitlement
@@ -53,8 +56,14 @@ These can be changed by :uid_field and :fields option.
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
-        :uid_field => :uid,
-        :fields => []
+        :uid_field                 => "uid",
+        :name_field                => "displayName",
+        :email_field               => "mail",
+        :fields => {
+          :location => "contactAddress",
+          :image    => "photo_url",
+          :phone    => "contactPhone",
+        }
       }
     end
 
