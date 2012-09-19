@@ -49,20 +49,20 @@ In the above example, 'unscoped-affiliation' and 'entitlement' attributes are ad
 
 https://github.com/intridea/omniauth/wiki/Auth-Hash-Schema
 
-'eppn' attribute is used as uid field. 'displayName' and 'mail' attributes are provided as request.env["omniauth.auth"]["info"]["name"] and request.env["omniauth.auth"]["info"]["email"].
+'eppn' attribute is used as uid field. 'displayName' attribute is provided as request.env["omniauth.auth"]["info"]["name"].
 
-These can be changed by :uid_field and :fields option.
+These can be changed by :uid_field, :name_field option. You can also add any "info" fields defined in Auth-Hash-Schema by using :info_fields option.
 
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
         :uid_field                 => "uid",
         :name_field                => "displayName",
-        :email_field               => "mail",
-        :fields => {
+        :info_fields => {
+          :email    => "mail",
           :location => "contactAddress",
           :image    => "photo_url",
-          :phone    => "contactPhone",
+          :phone    => "contactPhone"
         }
       }
     end
@@ -104,7 +104,7 @@ When you deploy a new application, you may want to confirm the assumed attribute
 
 ## License (MIT License)
 
-Copyright (C) 2011 by Toyokazu Akiyama.
+Copyright (C) 2011-2012 by Toyokazu Akiyama.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
