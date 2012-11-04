@@ -67,7 +67,7 @@ These can be changed by :uid_field, :name_field option. You can also add any "in
       }
     end
 
-In the above example, Shibboleth strategy does not pass any :info fields and use 'uid' attribute as uid fields.
+In the previous example, Shibboleth strategy does not pass any :info fields and use 'uid' attribute as uid fields.
 
 ### How to authenticate users
 
@@ -102,9 +102,27 @@ When you deploy a new application, you may want to confirm the assumed attribute
       provider :shibboleth, { :debug => true }
     end
 
+### devise integration issues (not solved yet)
+
+When you use omniauth with devise, the omniauth configuration is applied before devise configuration and some part of the configuration overwritten by the devise's. It may not work as you assume. So thus, in that case, currently you should write your configuration only in device configuration.
+
+config/initializers/devise.rb:
+```ruby
+config.omniauth :shibboleth, {:uid_field => 'eppn',
+                         :info_fields => {:email => 'mail', :name => 'cn', :last_name => 'sn'},
+                         :extra_fields => [:schacHomeOrganization]
+                  }
+```
+
+The detail is discussed in the following thread.
+
+https://github.com/toyokazu/omniauth-shibboleth/issues/5
+
+If you have any better approach, please let us know.
+
 ## License (MIT License)
 
-Copyright (C) 2011-2012 by Toyokazu Akiyama.
+omniauth-shibboleth is released under the MIT license.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
