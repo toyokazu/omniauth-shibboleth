@@ -69,9 +69,7 @@ These can be changed by :uid_field, :name_field option. You can also add any "in
 
 In the previous example, Shibboleth strategy does not pass any :info fields and use 'uid' attribute as uid fields.
 
-### !!!NOTICE!!!
-
-### devise integration issue (not solved yet)
+### !!!NOTICE!!! devise integration issue
 
 When you use omniauth with devise, the omniauth configuration is applied before devise configuration and some part of the configuration overwritten by the devise's. It may not work as you assume. So thus, in that case, currently you should write your configuration only in device configuration.
 
