@@ -36,9 +36,15 @@ module OmniAuth
         return fail!(:no_shibboleth_session) unless (request.env[options.shib_session_id_field.to_s] || request.env[options.shib_application_id_field.to_s])
         super
       end
-      
+
       uid do
-        request.env[options.uid_field.to_s]
+        uid_fields = Array(options.uid_field).map do |field|
+          request.env[field.to_s].to_s
+        end
+
+        uid_fields.reject do |field|
+          field == ""
+        end.first
       end
 
       info do

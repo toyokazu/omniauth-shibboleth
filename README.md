@@ -49,7 +49,7 @@ In the above example, 'unscoped-affiliation' and 'entitlement' attributes are ad
 
 https://github.com/intridea/omniauth/wiki/Auth-Hash-Schema
 
-'eppn' attribute is used as uid field. 'displayName' attribute is provided as request.env["omniauth.auth"]["info"]["name"].
+'eppn' attribute is used as uid field (default). 'displayName' attribute is provided as request.env["omniauth.auth"]["info"]["name"].
 
 These can be changed by :uid_field, :name_field option. You can also add any "info" fields defined in Auth-Hash-Schema by using :info_fields option.
 
@@ -68,6 +68,23 @@ These can be changed by :uid_field, :name_field option. You can also add any "in
     end
 
 In the previous example, Shibboleth strategy does not pass any :info fields and use 'uid' attribute as uid fields.
+
+### uid attribute fallbacks
+
+You can also set :uid_field to an array of attributes:
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, {
+        :uid_field                 => ["persistent-id", "eppn"],
+        :name_field                => "displayName",
+        :info_fields => {
+          :email    => "mail",
+        }
+      }
+    end
+
+The first non-empty attribute will be used. This allows you to handle accounts not directly representing physical persons.
 
 ### !!!NOTICE!!! devise integration issue
 
