@@ -82,6 +82,53 @@ describe OmniAuth::Strategies::Shibboleth do
       end
     end
 
+    context 'with fallback attribute for uid_field' do
+      let(:options){ {
+        :shib_session_id_field => 'Shib-Session-ID',
+        :shib_application_id_field => 'Shib-Application-ID',
+        :uid_field => [:persistent_id, :eppn],
+        :name_field => :displayName } }
+      let(:app){ lambda{|env| [404, {}, ['Awesome']]}}
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+
+      it 'should set uid to first attribute if first uid attribute is present' do
+        @dummy_id = 'abcdefg'
+        @persistent_id = 'persistent_id'
+        @eppn = 'eppn'
+        strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'persistent_id' => @persistent_id, 'eppn' => @eppn))
+        strategy.env['omniauth.auth']['uid'].should == @persistent_id
+      end
+
+      it 'should set uid to second attribute if first uid attribute is not present' do
+        @dummy_id = 'abcdefg'
+        @eppn = 'eppn'
+        strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'eppn' => @eppn))
+        strategy.env['omniauth.auth']['uid'].should == @eppn
+      end
+
+      it 'should set uid to second attribute if first uid attribute is empty' do
+        @dummy_id = 'abcdefg'
+        @persistent_id = ''
+        @eppn = 'eppn'
+        strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'persistent_id' => @persistent_id, 'eppn' => @eppn))
+        strategy.env['omniauth.auth']['uid'].should == @eppn
+      end
+
+      it 'should set uid to second attribute if first uid attribute is nil' do
+        @dummy_id = 'abcdefg'
+        @persistent_id = nil
+        @eppn = 'eppn'
+        strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'persistent_id' => @persistent_id, 'eppn' => @eppn))
+        strategy.env['omniauth.auth']['uid'].should == @eppn
+      end
+
+      it 'should set uid to nil if no attributes are present' do
+        @dummy_id = 'abcdefg'
+        strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id))
+        strategy.env['omniauth.auth']['uid'].should be_nil
+      end
+    end
+
     context 'with debug options' do
       let(:options){ { :debug => true} }
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
