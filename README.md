@@ -108,7 +108,20 @@ Shibboleth strategy assumes the attributes are provided via environment variable
 
 https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
 
-To provide Shibboleth attributes via environment variables, we can not use proxy_balancer base approach. Currently we can realize it by using Phusion Passenger as an application container. An example construction pattern is shown in presence_checker application (https://github.com/toyokazu/presence_checker/).
+To provide Shibboleth attributes via environment variables, we can not use mod_proxy_balancer based approach. Currently we can realize it by using Phusion Passenger as an application container. An example construction pattern is shown in presence_checker application (https://github.com/toyokazu/presence_checker/).
+
+### :request_type option
+
+You understand the issues using ShibUseHeaders, but and yet if you want to use the mod_proxy_balancer based approach, you can use :request_type option. This option enables us to specify what kind of parameters are used to create 'omniauth.auth' (auth hash). The option values are:
+
+- **:env** (default) The environment variables are used to create auth hash.
+- **:header** The auth hash is created from header vaiables. In the Rack middleware, since header variables are treated as environment variables like HTTP_*, the specified variables are converted as the same as header variables, HTTP_*. This :request_type is basically used for mod_proxy_balancer approach.
+- **:params** The query string or POST parameters are used to create auth hash. This :request_type is basically used for development phase.
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, { :request_type => :header }
+    end
 
 ### debug mode
 
