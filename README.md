@@ -118,6 +118,8 @@ You understand the issues using ShibUseHeaders, but and yet if you want to use t
 - **:header** The auth hash is created from header vaiables. In the Rack middleware, since header variables are treated as environment variables like HTTP_*, the specified variables are converted as the same as header variables, HTTP_*. This :request_type is basically used for mod_proxy_balancer approach.
 - **:params** The query string or POST parameters are used to create auth hash. This :request_type is basically used for development phase.
 
+The following is an example configuration.
+
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, { :request_type => :header }
