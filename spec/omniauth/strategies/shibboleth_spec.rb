@@ -29,9 +29,9 @@ describe OmniAuth::Strategies::Shibboleth do
       get '/auth/shibboleth'
     end
 
-    it 'should redirect to callback_url' do
-      last_response.status.should == 302
-      last_response.location.should == '/auth/shibboleth/callback'
+    it 'is expected to redirect to callback_url' do
+      expect(last_response.status).to eq(302)
+      expect(last_response.location).to eq('/auth/shibboleth/callback')
     end
   end
 
@@ -41,22 +41,22 @@ describe OmniAuth::Strategies::Shibboleth do
         get '/auth/shibboleth/callback'
       end
 
-      it 'should fail to get Shib-Session-ID environment variable' do
-        last_response.status.should == 302
-        last_response.location.should == failure_path
+      it 'is expected to fail to get Shib-Session-ID environment variable' do
+        expect(last_response.status).to eq(302)
+        expect(last_response.location).to eq(failure_path)
       end
     end
 
     context 'with Shibboleth session' do
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, {}) }
 
-      it 'should set default omniauth.auth fields' do
+      it 'is expected to set default omniauth.auth fields' do
         @dummy_id = 'abcdefg'
         @eppn = 'test@example.com'
         @display_name = 'Test User'
         strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'eppn' => @eppn, 'displayName' => @display_name))
-        strategy.env['omniauth.auth']['uid'].should == @eppn
-        strategy.env['omniauth.auth']['info']['name'].should == @display_name
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@eppn)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
       end
     end
 
@@ -71,15 +71,15 @@ describe OmniAuth::Strategies::Shibboleth do
       let(:app){ lambda{|env| [404, {}, ['Awesome']]}}
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 
-      it 'should set specified omniauth.auth fields' do
+      it 'is expected to set specified omniauth.auth fields' do
         @dummy_id = 'abcdefg'
         @uid = 'test'
         @organization = 'Test Corporation'
         @affiliation = 'faculty'
         strategy.call!(make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'o' => @organization, 'affiliation' => @affiliation))
-        strategy.env['omniauth.auth']['uid'].should == @uid
-        strategy.env['omniauth.auth']['extra']['raw_info']['o'].should == @organization
-        strategy.env['omniauth.auth']['extra']['raw_info']['affiliation'].should == @affiliation
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['o']).to eq(@organization)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['affiliation']).to eq(@affiliation)
       end
     end
 
@@ -87,13 +87,13 @@ describe OmniAuth::Strategies::Shibboleth do
       let(:options){ { :debug => true} }
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 
-      it 'should raise environment variables' do
+      it 'is expected to raise environment variables' do
         @dummy_id = 'abcdefg'
         @eppn = 'test@example.com'
         @display_name = 'Test User'
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'eppn' => @eppn, 'displayName' => @display_name)
         response = strategy.call!(env)
-        response[0].should == 200
+        expect(response[0]).to eq(200)
       end
     end
 
@@ -108,7 +108,7 @@ describe OmniAuth::Strategies::Shibboleth do
         :extra_fields => [:o, :affiliation] } }
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 
-      it 'should handle header variables' do
+      it 'is expected to handle header variables' do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = 'test'
@@ -116,10 +116,36 @@ describe OmniAuth::Strategies::Shibboleth do
         @affiliation = 'faculty'
         env = make_env('/auth/shibboleth/callback', 'HTTP_SHIB_SESSION_ID' => @dummy_id, 'HTTP_DISPLAYNAME' => @display_name, 'HTTP_UID' => @uid, 'HTTP_O' => @organization, 'HTTP_AFFILIATION' => @affiliation)
         response = strategy.call!(env)
-        strategy.env['omniauth.auth']['uid'].should == @uid
-        strategy.env['omniauth.auth']['info']['name'].should == @display_name
-        strategy.env['omniauth.auth']['extra']['raw_info']['o'].should == @organization
-        strategy.env['omniauth.auth']['extra']['raw_info']['affiliation'].should == @affiliation
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['o']).to eq(@organization)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['affiliation']).to eq(@affiliation)
+      end
+    end
+    
+    context "with request_type = 'header'" do
+      let(:options){ {
+        :request_type => 'header',
+        :shib_session_id_field => 'Shib-Session-ID',
+        :shib_application_id_field => 'Shib-Application-ID',
+        :uid_field => :uid,
+        :name_field => :displayName,
+        :info_fields => {},
+        :extra_fields => [:o, :affiliation] } }
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+
+      it 'is expected to handle header variables' do
+        @dummy_id = 'abcdefg'
+        @display_name = 'Test User'
+        @uid = 'test'
+        @organization = 'Test Corporation'
+        @affiliation = 'faculty'
+        env = make_env('/auth/shibboleth/callback', 'HTTP_SHIB_SESSION_ID' => @dummy_id, 'HTTP_DISPLAYNAME' => @display_name, 'HTTP_UID' => @uid, 'HTTP_O' => @organization, 'HTTP_AFFILIATION' => @affiliation)
+        response = strategy.call!(env)
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['o']).to eq(@organization)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['affiliation']).to eq(@affiliation)
       end
     end
 
@@ -134,7 +160,7 @@ describe OmniAuth::Strategies::Shibboleth do
         :extra_fields => [:o, :affiliation] } }
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 
-      it 'should handle params variables' do
+      it 'is expected to handle params variables' do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = 'test'
@@ -142,10 +168,10 @@ describe OmniAuth::Strategies::Shibboleth do
         @affiliation = 'faculty'
         env = make_env('/auth/shibboleth/callback', 'QUERY_STRING' => "Shib-Session-ID=#{@dummy_id}&uid=#{@uid}&displayName=#{@display_name}&o=#{@organization}&affiliation=#{@affiliation}")
         response = strategy.call!(env)
-        strategy.env['omniauth.auth']['uid'].should == @uid
-        strategy.env['omniauth.auth']['info']['name'].should == @display_name
-        strategy.env['omniauth.auth']['extra']['raw_info']['o'].should == @organization
-        strategy.env['omniauth.auth']['extra']['raw_info']['affiliation'].should == @affiliation
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['o']).to eq(@organization)
+        expect(strategy.env['omniauth.auth']['extra']['raw_info']['affiliation']).to eq(@affiliation)
       end
     end
   end

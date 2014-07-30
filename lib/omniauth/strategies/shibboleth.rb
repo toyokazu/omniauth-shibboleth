@@ -25,20 +25,20 @@ module OmniAuth
 
       def request_params
         case options[:request_type]
-        when :env, :header
+        when :env, 'env', :header, 'header'
           request.env
-        when :params
+        when :params, 'params'
           request.params
         end
       end
 
       def request_param(key)
         case options[:request_type]
-        when :env
+        when :env, 'env'
           request.env[key]
-        when :header
+        when :header, 'header'
           request.env["HTTP_#{key.upcase.gsub('-', '_')}"]
-        when :params
+        when :params, 'params'
           request.params[key]
         end
       end

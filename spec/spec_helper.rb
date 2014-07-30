@@ -6,5 +6,5 @@ require 'omniauth-shibboleth'
 
 RSpec.configure do |config|
     config.include Rack::Test::Methods
-    config.color_enabled = true
+    config.color = true
 end
