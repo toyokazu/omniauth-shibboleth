@@ -57,17 +57,26 @@ module OmniAuth
         return fail!(:no_shibboleth_session) unless (request_param(options.shib_session_id_field.to_s) || request_param(options.shib_application_id_field.to_s))
         super
       end
+
+      def option_handler(option_field)
+        if option_field.class == String ||
+          option_field.class == Symbol
+          request_param(option_field.to_s)
+        elsif option_field.class == Proc
+          option_field.call(self.method(:request_param))
+        end
+      end
       
       uid do
-        request_param(options.uid_field.to_s)
+        option_handler(options.uid_field)
       end
 
       info do
         res = {
-          :name  => request_param(options.name_field.to_s)
+          :name => option_handler(options.name_field)
         }
-        options.info_fields.each_pair do |k,v|
-          res[k] = request_param(v.to_s)
+        options.info_fields.each_pair do |key, field|
+          res[key] = option_handler(field)
         end
         res
       end
