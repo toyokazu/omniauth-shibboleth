@@ -1,5 +1,8 @@
 # OmniAuth Shibboleth strategy
 
+[![Gem Version](http://img.shields.io/gem/v/omniauth-shibboleth.svg)][gem]
+[![Build Status](http://img.shields.io/travis/toyokazu/omniauth-shibboleth.svg)][travis]
+
 OmniAuth Shibboleth strategy is an OmniAuth strategy for authenticating through Shibboleth (SAML). If you do not know OmniAuth, please visit OmniAuth wiki.
 
 https://github.com/intridea/omniauth/wiki
