@@ -68,7 +68,6 @@ describe OmniAuth::Strategies::Shibboleth do
         :shib_application_id_field => 'Shib-Application-ID',
         :uid_field => :uid,
         :name_field => :sn,
-        #:name_field => :displayName,
         :info_fields => {},
         :extra_fields => [:o, :affiliation] } }
       let(:app){ lambda{|env| [404, {}, ['Not Found']]}}
@@ -231,6 +230,49 @@ describe OmniAuth::Strategies::Shibboleth do
         expect(strategy.env['omniauth.auth']['info']['affiliation']).to eq("#{@affiliation}@my.localdomain")
         expect(strategy.env['omniauth.auth']['extra']['raw_info']['o']).to eq(@organization)
         expect(strategy.env['omniauth.auth']['extra']['raw_info']['affiliation']).to eq(@affiliation)
+      end
+    end
+
+    context 'with :set_null_as_nil = false' do
+      let(:options){ {
+        :request_type => :env,
+        :set_null_as_nil => false,
+        :uid_field => :uid,
+        :name_field => :displayName,
+        :info_fields => {} } }
+      let(:app){ lambda{|env| [200, {}, ['OK']]}}
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+
+      it 'is expected to output null (empty) uid as it is' do
+        @dummy_id = 'abcdefg'
+        @display_name = 'Test User'
+        @uid = ''
+        env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name)
+        response = strategy.call!(env)
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+      end
+    end
+
+    context 'with :set_null_as_nil = true' do
+      let(:options){ {
+        :set_null_as_nil => true,
+        :shib_session_id_field => 'Shib-Session-ID',
+        :shib_application_id_field => 'Shib-Application-ID',
+        :uid_field => :uid,
+        :name_field => :displayName,
+        :info_fields => {} } }
+      let(:app){ lambda{|env| [200, {}, ['OK']]}}
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+
+      it 'is expected to output null (empty) uid as nil uid' do
+        @dummy_id = 'abcdefg'
+        @display_name = 'Test User'
+        @uid = ''
+        env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name)
+        response = strategy.call!(env)
+        expect(strategy.env['omniauth.auth']['uid']).to eq(nil)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
       end
     end
   end

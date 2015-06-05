@@ -10,6 +10,7 @@ module OmniAuth
       option :info_fields, {}
       option :extra_fields, []
       option :debug, false
+      option :set_null_as_nil, false
       option :request_type, :env
 
       def request_phase
@@ -59,12 +60,17 @@ module OmniAuth
       end
 
       def option_handler(option_field)
+        res = nil
         if option_field.class == String ||
           option_field.class == Symbol
-          request_param(option_field.to_s)
+          res = request_param(option_field.to_s)
         elsif option_field.class == Proc
-          option_field.call(self.method(:request_param))
+          res = option_field.call(self.method(:request_param))
         end
+        if options[:set_null_as_nil]
+          res = nil if res.empty?
+        end
+        res
       end
       
       uid do
