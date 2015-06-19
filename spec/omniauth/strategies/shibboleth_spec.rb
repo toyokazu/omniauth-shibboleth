@@ -10,11 +10,19 @@ def make_env(path = '/auth/shibboleth', props = {})
   }.merge(props)
 end
 
-def failure_path
+def without_session_failure_path
   if OmniAuth::VERSION >= "1.0" && OmniAuth::VERSION < "1.1"
     "/auth/failure?message=no_shibboleth_session"
   elsif OmniAuth::VERSION >= "1.1"
     "/auth/failure?message=no_shibboleth_session&strategy=shibboleth"
+  end
+end
+
+def empty_uid_failure_path
+  if OmniAuth::VERSION >= "1.0" && OmniAuth::VERSION < "1.1"
+    "/auth/failure?message=empty_uid"
+  elsif OmniAuth::VERSION >= "1.1"
+    "/auth/failure?message=empty_uid&strategy=shibboleth"
   end
 end
 
@@ -44,7 +52,7 @@ describe OmniAuth::Strategies::Shibboleth do
 
       it 'is expected to fail to get Shib-Session-ID environment variable' do
         expect(last_response.status).to eq(302)
-        expect(last_response.location).to eq(failure_path)
+        expect(last_response.location).to eq(without_session_failure_path)
       end
     end
 
@@ -233,10 +241,10 @@ describe OmniAuth::Strategies::Shibboleth do
       end
     end
 
-    context 'with :set_null_as_nil = false' do
+    context 'empty uid with :fail_with_empty_uid = false' do
       let(:options){ {
         :request_type => :env,
-        :set_null_as_nil => false,
+        :fail_with_empty_uid => false,
         :uid_field => :uid,
         :name_field => :displayName,
         :info_fields => {} } }
@@ -250,13 +258,13 @@ describe OmniAuth::Strategies::Shibboleth do
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name)
         response = strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
-        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
       end
     end
 
-    context 'with :set_null_as_nil = true' do
+    context 'empty uid with :fail_with_empty_uid = true' do
       let(:options){ {
-        :set_null_as_nil => true,
+        :request_type => :env,
+        :fail_with_empty_uid => true,
         :shib_session_id_field => 'Shib-Session-ID',
         :shib_application_id_field => 'Shib-Application-ID',
         :uid_field => :uid,
@@ -265,14 +273,14 @@ describe OmniAuth::Strategies::Shibboleth do
       let(:app){ lambda{|env| [200, {}, ['OK']]}}
       let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
 
-      it 'is expected to output null (empty) uid as nil uid' do
+      it 'is expected to fail because of the empty uid' do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = ''
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name)
         response = strategy.call!(env)
-        expect(strategy.env['omniauth.auth']['uid']).to eq(nil)
-        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+        expect(response[0]).to eq(302)
+        expect(response[1]["Location"]).to eq(empty_uid_failure_path)
       end
     end
   end

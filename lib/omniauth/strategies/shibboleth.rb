@@ -10,7 +10,7 @@ module OmniAuth
       option :info_fields, {}
       option :extra_fields, []
       option :debug, false
-      option :set_null_as_nil, false
+      option :fail_with_empty_uid, false
       option :request_type, :env
 
       def request_phase
@@ -56,21 +56,17 @@ module OmniAuth
           ]
         end
         return fail!(:no_shibboleth_session) unless (request_param(options.shib_session_id_field.to_s) || request_param(options.shib_application_id_field.to_s))
+        return fail!(:empty_uid) if options[:fail_with_empty_uid] && option_handler(options.uid_field).empty?
         super
       end
 
       def option_handler(option_field)
-        res = nil
         if option_field.class == String ||
           option_field.class == Symbol
-          res = request_param(option_field.to_s)
+          request_param(option_field.to_s)
         elsif option_field.class == Proc
-          res = option_field.call(self.method(:request_param))
+          option_field.call(self.method(:request_param))
         end
-        if options[:set_null_as_nil]
-          res = nil if res.empty?
-        end
-        res
       end
       
       uid do
