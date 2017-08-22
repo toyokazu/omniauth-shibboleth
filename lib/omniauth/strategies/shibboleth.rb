@@ -12,6 +12,7 @@ module OmniAuth
       option :debug, false
       option :fail_with_empty_uid, false
       option :request_type, :env
+      option :multi_values, :raw
 
       def request_phase
         [ 
@@ -25,7 +26,7 @@ module OmniAuth
       end
 
       def request_params
-        case options[:request_type]
+        case options.request_type
         when :env, 'env', :header, 'header'
           request.env
         when :params, 'params'
@@ -34,18 +35,32 @@ module OmniAuth
       end
 
       def request_param(key)
-        case options[:request_type]
-        when :env, 'env'
-          request.env[key]
-        when :header, 'header'
-          request.env["HTTP_#{key.upcase.gsub('-', '_')}"]
-        when :params, 'params'
-          request.params[key]
+        multi_value_handler(
+          case options.request_type
+          when :env, 'env'
+            request.env[key]
+          when :header, 'header'
+            request.env["HTTP_#{key.upcase.gsub('-', '_')}"]
+          when :params, 'params'
+            request.params[key]
+          end
+        )
+      end
+
+      def multi_value_handler(param_value)
+        case options.multi_values
+        when :raw, 'raw'
+          param_value
+        when :first, 'first'
+          return nil if param_value.nil?
+          param_value.split(";").first
+        else
+          eval(options.multi_values).call(param_value)
         end
       end
 
       def callback_phase
-        if options[:debug]
+        if options.debug
           # dump attributes
           return [
             200,
@@ -56,7 +71,7 @@ module OmniAuth
           ]
         end
         return fail!(:no_shibboleth_session) unless (request_param(options.shib_session_id_field.to_s) || request_param(options.shib_application_id_field.to_s))
-        return fail!(:empty_uid) if options[:fail_with_empty_uid] && option_handler(options.uid_field).empty?
+        return fail!(:empty_uid) if options.fail_with_empty_uid && option_handler(options.uid_field).empty?
         super
       end
 

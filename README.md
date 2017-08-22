@@ -167,6 +167,48 @@ When you deploy a new application, you may want to confirm the assumed attribute
       provider :shibboleth, { :debug => true }
     end
 
+### :multi_values option
+
+If your application want to receive multiple values as one attribute, Shibboleth passes them as follows:
+
+    user2@example2.com;user1@example1.com;user3@example3.com
+
+If your application only want the first entry sorted by dictionary order, you can use flexible attribute configuration as follows:
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, {
+        :info_fields => {
+          :email    => lambda {|request_param| request_param.call('email').split(";").sort[0]}
+        }
+      }
+    end
+
+However, if you use device to integrate omniauth, lambda function cannot be used. In such a situation, if you still think that attribute conversions in the middleware is required, you can use :multi_values option.
+
+- **:raw** (default) Raw multiple values are passed to the application.
+- **:first** The first entry of multiple values is passed to the application.
+- **lambda function** The other descriptions are regarded as lambda function written in String form. The string will be evaluated as Ruby code and used for processing multiple values in the attribute.
+
+If you specify :first, you can obtain `user2@example.com` in the above example.
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, {
+        :multi_values => :first
+      }
+    end
+
+If you need the first attribute in the dictionary order, you can specify lambda function in String form as follows:
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, {
+        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(";").sort[0]}'
+      }
+    end
+
+
 ## License (MIT License)
 
 omniauth-shibboleth is released under the MIT license.
