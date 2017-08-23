@@ -299,7 +299,7 @@ describe OmniAuth::Strategies::Shibboleth do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = 'test'
-        @mail = 'test2@example.com;test1@example.com;test3@example.com'
+        @mail = 'test2\;hoge@example.com;test1\;hoge@example.com;test3\;hoge@example.com'
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name, 'mail' => @mail)
         strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
@@ -324,18 +324,18 @@ describe OmniAuth::Strategies::Shibboleth do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = 'test'
-        @mail = 'test2@example.com;test1@example.com;test3@example.com'
+        @mail = 'test2\;hoge@example.com;test1\;hoge@example.com;test3\;hoge@example.com'
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name, 'mail' => @mail)
         strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
         expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
-        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test2@example.com')
+        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test2\;hoge@example.com')
       end
     end
 
     context 'with :multi_values => lambda function' do
       let(:options){ {
-        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(";").sort[0]}',
+        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(/(?<!\\\\);/).sort[0]}',
         :request_type => :env,
         :shib_session_id_field => 'Shib-Session-ID',
         :shib_application_id_field => 'Shib-Application-ID',
@@ -348,12 +348,12 @@ describe OmniAuth::Strategies::Shibboleth do
         @dummy_id = 'abcdefg'
         @display_name = 'Test User'
         @uid = 'test'
-        @mail = 'test2@example.com;test1@example.com;test3@example.com'
+        @mail = 'test2\;hoge@example.com;test1\;hoge@example.com;test3\;hoge@example.com'
         env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'displayName' => @display_name, 'mail' => @mail)
         strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
         expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
-        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test1@example.com')
+        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test1\;hoge@example.com')
       end
     end
 

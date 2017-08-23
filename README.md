@@ -173,13 +173,13 @@ If your application want to receive multiple values as one attribute, Shibboleth
 
     user2@example2.com;user1@example1.com;user3@example3.com
 
-If your application only want the first entry sorted by dictionary order, you can use flexible attribute configuration as follows:
+If your application only wants the first entry sorted by alphabetical order, you can use flexible attribute configuration as follows (since semicolons in attribute values are escaped with a backslash, escaped semicolons are skiped for splitting):
 
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
         :info_fields => {
-          :email    => lambda {|request_param| request_param.call('email').split(";").sort[0]}
+          :email    => lambda {|request_param| request_param.call('email').split(/(?<!\\);/).sort[0]}
         }
       }
     end
@@ -199,12 +199,12 @@ If you specify :first, you can obtain `user2@example.com` in the above example.
       }
     end
 
-If you need the first attribute in the dictionary order, you can specify lambda function in String form as follows:
+If you need the first attribute in alphabetical order, you can specify lambda function in String form as follows:
 
     % vi config/initializer/omniauth.rb
     Rails.application.config.middleware.use OmniAuth::Builder do
       provider :shibboleth, {
-        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(";").sort[0]}'
+        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(/(?<!\\\\);/).sort[0]}'
       }
     end
 
