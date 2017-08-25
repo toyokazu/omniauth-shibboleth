@@ -53,7 +53,7 @@ module OmniAuth
           param_value
         when :first, 'first'
           return nil if param_value.nil?
-          param_value.split(/(?<!\\);/).first
+          param_value.split(/(?<!\\);/).first.gsub('\\;', ';')
         else
           eval(options.multi_values).call(param_value)
         end

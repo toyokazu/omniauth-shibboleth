@@ -329,13 +329,13 @@ describe OmniAuth::Strategies::Shibboleth do
         strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
         expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
-        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test2\;hoge@example.com')
+        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test2;hoge@example.com')
       end
     end
 
     context 'with :multi_values => lambda function' do
       let(:options){ {
-        :multi_values => 'lambda {|param_value| param_value.nil? ? nil : param_value.split(/(?<!\\\\);/).sort[0]}',
+        :multi_values => "lambda {|param_value| param_value.nil? ? nil : param_value.split(/(?<!\\\\);/).sort[0].gsub('\\;',';')}",
         :request_type => :env,
         :shib_session_id_field => 'Shib-Session-ID',
         :shib_application_id_field => 'Shib-Application-ID',
@@ -353,7 +353,7 @@ describe OmniAuth::Strategies::Shibboleth do
         strategy.call!(env)
         expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
         expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
-        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test1\;hoge@example.com')
+        expect(strategy.env['omniauth.auth']['info']['email']).to eq('test1;hoge@example.com')
       end
     end
 
