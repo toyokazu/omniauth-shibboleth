@@ -208,6 +208,19 @@ If you need the first attribute in alphabetical order, you can specify lambda fu
       }
     end
 
+### :force_eval_option_fields option
+
+If you still feel inconvenience under device environment, you can try :force_eval_option_fields option to enforce eval the option field value. It enables flexible attribute configuration using lambda function. In this case, you need to use Symbol to specify a simple attribute name instead of String to distinguish attribute names and method names defined in omniauth-shibboleth, e.g. uid.
+
+    % vi config/initializer/omniauth.rb
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :shibboleth, {
+        :force_eval_option_fields => true,
+        :name_field => "lambda {|request_param| request_param.call('cn') + ' ' + request_param.call('sn')}",
+        :uid_field => ":uid",
+        :info_field => {:email => ":mail"}
+      }
+    end
 
 ## License (MIT License)
 

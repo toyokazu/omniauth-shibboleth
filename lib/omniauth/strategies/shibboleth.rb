@@ -13,6 +13,7 @@ module OmniAuth
       option :fail_with_empty_uid, false
       option :request_type, :env
       option :multi_values, :raw
+      option :force_eval_option_fields, false
 
       def request_phase
         [ 
@@ -76,11 +77,20 @@ module OmniAuth
       end
 
       def option_handler(option_field)
-        if option_field.class == String ||
-          option_field.class == Symbol
-          request_param(option_field.to_s)
-        elsif option_field.class == Proc
-          option_field.call(self.method(:request_param))
+        if options.force_eval_option_fields
+          result = eval(option_field)
+          if result.class == Symbol
+            request_param(result.to_s)
+          elsif result.class == Proc
+            result.call(self.method(:request_param))
+          end
+        else
+          if option_field.class == String ||
+              option_field.class == Symbol
+            request_param(option_field.to_s)
+          elsif option_field.class == Proc
+            option_field.call(self.method(:request_param))
+          end
         end
       end
       

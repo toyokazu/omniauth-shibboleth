@@ -356,6 +356,32 @@ describe OmniAuth::Strategies::Shibboleth do
         expect(strategy.env['omniauth.auth']['info']['email']).to eq('test1;hoge@example.com')
       end
     end
+    
+    context 'with :force_eval_option_fields => true' do
+      let(:options){ {
+        :force_eval_option_fields => true,
+        :request_type => :env,
+        :shib_session_id_field => 'Shib-Session-ID',
+        :shib_application_id_field => 'Shib-Application-ID',
+        :uid_field => ":uid",
+        :name_field => "lambda {|request_param| request_param.call('cn') + ' ' + request_param.call('sn')}",
+        :info_fields => {:email => ":mail"} } }
+      let(:app){ lambda{|env| [200, {}, ['OK']]}}
+      let(:strategy){ OmniAuth::Strategies::Shibboleth.new(app, options) }
+      it 'is expected return the processed value by specifying lambda function' do
+        @dummy_id = 'abcdefg'
+        @cn = 'Test'
+        @sn = 'User'
+        @display_name = 'Test User'
+        @uid = 'test'
+        @mail = 'hoge@example.com'
+        env = make_env('/auth/shibboleth/callback', 'Shib-Session-ID' => @dummy_id, 'uid' => @uid, 'cn' => @cn, 'sn' => @sn, 'mail' => @mail)
+        strategy.call!(env)
+        expect(strategy.env['omniauth.auth']['uid']).to eq(@uid)
+        expect(strategy.env['omniauth.auth']['info']['name']).to eq(@display_name)
+        expect(strategy.env['omniauth.auth']['info']['email']).to eq('hoge@example.com')
+      end
+    end
 
   end
 end
