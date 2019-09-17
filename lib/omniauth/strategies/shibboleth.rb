@@ -8,6 +8,7 @@ module OmniAuth
       option :uid_field, 'eppn'
       option :name_field, 'displayName'
       option :info_fields, {}
+      option :credentials_fields, {}
       option :extra_fields, []
       option :debug, false
       option :fail_with_empty_uid, false
@@ -93,6 +94,14 @@ module OmniAuth
           :name => option_handler(options.name_field)
         }
         options.info_fields.each_pair do |key, field|
+          res[key] = option_handler(field)
+        end
+        res
+      end
+
+      credentials do
+        res = {}
+        options.credentials_fields.each_pair do |key, field|
           res[key] = option_handler(field)
         end
         res
